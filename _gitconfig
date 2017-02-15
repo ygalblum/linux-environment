@@ -1,0 +1,27 @@
+[diff]
+    tool = diffuse
+[difftool]
+    prompt = false
+[alias]
+	ff = difftool -y
+    cached = difftool -y --cached
+	co = checkout
+	ci = commit
+	b = branch
+	gr = grep --color
+	dstat = diff --stat
+	dup = diff --name-status
+	st = status --un=no
+    track = !sh -c 'git branch --track "$0" "$1" && git checkout "$0"'
+[color]
+	ui = auto
+[core]
+	excludesfile = /home/ygal/.gitignore
+	autocrlf = input
+[user]
+	name = Ygal Blum
+	email = ygal.blum@gmail.com
+[push]
+	default = simple
+[apply]
+	ignorewhitespace = change

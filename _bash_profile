@@ -1,0 +1,128 @@
+
+# Color the prompt
+BLACK=0m
+RED=31m
+GREEN=32m
+YELLOW=33m
+BLUE=34m
+PURPLE=35m
+BACK_YELLOW=103m
+
+COLOR=$PURPLE
+FG_COLOR=$BLACK
+
+PS1="\[\e[$COLOR\][\u@\h \w]\$\[\e[$FG_COLOR\] "
+
+# https://bugs.launchpad.net/ubuntu/+source/pidgin/+bug/950790
+export NSS_SSL_CBC_RANDOM_IV=0
+
+export PATH=$HOME/repowrt:$PATH
+. "$HOME/repowrt/extras/repowrt_completion.sh"
+
+alias grepr='grep -rnI'
+
+[ -z "$GVIM_PATH" ] && export GVIM_PATH=`which gvim 2>/dev/null`
+
+#http://askubuntu.com/questions/10481/how-do-i-enable-or-disable-the-global-application-menu/133005#133005
+export UBUNTU_MENUPROXY=
+
+function jgrep()
+{
+    "grep" -H -R -n --color=auto "$@" *
+}
+
+set_func_opt()
+{
+    func_opt=("$@")
+    func_opt_stdin=0
+    func_opt_fg=0
+    local i j
+
+    # handle jumping to a specific line: g <filename>:<line>:<junk>
+    # A quick hack for gvim_func_fg: it adds '-f' option, and it is used
+    # in editor.sh...:
+    j=0 # the position of the filename. if -f is used, then should be 1
+    if [ ${#func_opt[@]} = 2 -a "${func_opt[0]}" = "-f" ] ; then
+        j=1
+    fi
+    if [ ${#func_opt[@]} = $((j+1)) ] &&
+        [ "${func_opt[j]/*:}" != "${func_opt[j]}" ]
+    then
+	local file=${func_opt[j]/:*} # extract <filename>
+	local lineno=${func_opt[j]/$file:}; # extract <line>:<junk>
+	local lineno=${lineno/:*}; # extract <line>
+	func_opt=("$file" "+$lineno")
+	if [ $j = 2 ] ; then
+            func_opt=("-f" "${func_opt[@]}")
+	fi
+    fi
+
+    # check if '-' option is given for stdin
+    i=0
+    while [ ! -z "${func_opt[i]}" ] ; do 
+	if [ "${func_opt[i]}" = "-" ] ; then
+            func_opt_stdin=1
+	elif [ "${func_opt[i]}" = "-f" ] ; then
+	    func_opt_fg=1
+	fi
+	i=$((i+1))
+    done
+}
+
+gvim_func()
+{
+    # parse the options for gvim line jump
+    set_func_opt "$@"
+    # for Linux - run GVIM with no changes
+    $GVIM_PATH "${func_opt[@]}"
+}
+
+g()
+{
+    gvim_func "$@"
+}
+
+if [ -n "$DESKTOP_SESSION" ];then 
+    # No point to start gnome-keyring-daemon if ssh-agent is not up 
+    if [ -n "$SSH_AGENT_PID" ];then 
+        eval $(gnome-keyring-daemon --start) 
+        export SSH_AUTH_SOCK
+	export GPG_AGENT_INFO
+        export GNOME_KEYRING_CONTROL
+    fi
+fi
+
+
+# NodeJS and NPM related
+NPM_PACKAGES="${HOME}/.npm-packages"
+NODE_PATH="$NPM_PACKAGES/lib/node_modules:$NODE_PATH"
+PATH="$NPM_PACKAGES/bin:$PATH"
+# Unset manpath so we can inherit from /etc/manpath via the `manpath`
+# command
+unset MANPATH # delete if you already modified MANPATH elsewhere in your config
+MANPATH="$NPM_PACKAGES/share/man:$(manpath)"
+
+# SmartHome related stuff
+export PATH=/opt/apache-maven-3.0.5/bin:$PATH
+#export SMARTHOME_DIR=/usr/${USER}/smarthome
+export ANDROID_HOME=${HOME}/opt/android-sdk
+export ANDROID_NDK_HOME=${ANDROID_HOME}/ndk-bundle
+# For Release versions > R3.5.B
+#export ANDROID_NDK_ROOT=${HOME}/Android/Sdk/ndk-bundle
+# Configure JAVA with the path where JAVA is installed
+export JAVA_HOME=/usr/lib/jvm/default-java
+export PATH=${HOME}/opt/android-studio/bin:$PATH
+
+export GRADLE_HOME=/usr/local/gradle/gradle-3.0
+export PATH=$GRADLE_HOME/bin:$PATH
+
+export NVM_DIR="/home/blumy/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && . "$NVM_DIR/nvm.sh"  # This loads nvm
+
+export RVM_PATH="$HOME/.rvm"
+export PATH="$PATH:$RVM_PATH/bin" # Add RVM to PATH for scripting
+
+[[ -s "$RVM_PATH/scripts/rvm" ]] && source "$RVM_PATH/scripts/rvm" # Load RVM into a shell session *as a function*
+[[ -r "$RVM_PATH/scripts/completion" ]] && . "$RVM_PATH/scripts/completion"
+export PATH="$PATH:$HOME/.rvm/bin" # Add RVM to PATH for scripting
+
