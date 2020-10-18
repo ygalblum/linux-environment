@@ -1,0 +1,158 @@
+SSH Remove Host
+---------------
+ssh-keygen -R <hostname or IP address>
+
+K8S Manual Installation - Centos
+-----------------------
+yum install -y yum-utils
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+yum makecache fast
+yum install -y docker-ce-18.09.4-3.el7.x86_64
+systemctl enable docker
+systemctl start docker
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+        https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOF
+export KUBE_VERSION=1.14.3
+yum -y install kubelet-$KUBE_VERSION-0.x86_64 kubeadm-$KUBE_VERSION-0.x86_64 kubectl-$KUBE_VERSION-0.x86_64
+
+Get Image list for version:
+---------------------------
+kubeadm config images list --kubernetes-version $KUBE_VERSION
+
+Fedora 28 QCOW2 image
+---------------------
+https://download.fedoraproject.org/pub/fedora/linux/releases/28/Cloud/x86_64/images/Fedora-Cloud-Base-28-1.1.x86_64.qcow2
+Docker version: docker-ce.x86_64:18.06.1.ce-3.fc28
+https://dl.fedoraproject.org/pub/fedora/linux/releases/27/CloudImages/x86_64/images/Fedora-Cloud-Base-27-1.6.x86_64.qcow2
+Docker version: docker-ce.x86_64:18.06.1.ce-3.fc28
+
+K8S Manual Installation
+-----------------------
+sudo su
+dnf remove docker docker-client docker-client-latest docker-common docker-latest docker-latest-logrotate docker-logrotate docker-selinux docker-engine-selinux docker-engine
+dnf -y install dnf-plugins-core
+dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+dnf -y install docker-ce-18.06.1.ce-3.fc28.x86_64
+systemctl enable docker
+systemctl start docker
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+        https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOF
+export KUBE_VERSION=1.13.4
+dnf -y install kubelet-$KUBE_VERSION-0.x86_64 kubeadm-$KUBE_VERSION-0.x86_64 kubectl-$KUBE_VERSION-0.x86_64
+hostnamectl set-hostname host-10-0-0-8.symphony
+
+kubeadm alpha phase certs all --config /tmp/kubeadm-config.yaml
+kubeadm alpha phase kubelet config write-to-disk --config /tmp/kubeadm-config.yaml
+kubeadm alpha phase kubelet write-env-file --config /tmp/kubeadm-config.yaml
+kubeadm alpha phase kubeconfig kubelet --config /tmp/kubeadm-config.yaml
+systemctl start kubelet
+kubeadm alpha phase etcd local --config /tmp/kubeadm-config.yaml
+export CP0_IP=192.168.30.100
+export CP0_HOSTNAME=host-192-168-30-100.symphony
+export CP1_IP=192.168.30.102
+export CP1_HOSTNAME=host-192-168-30-102.symphony
+export KUBECONFIG=/etc/kubernetes/admin.conf
+kubectl exec -n kube-system etcd-${CP0_HOSTNAME} -- etcdctl --ca-file /etc/kubernetes/pki/etcd/ca.crt --cert-file /etc/kubernetes/pki/etcd/peer.crt --key-file /etc/kubernetes/pki/etcd/peer.key --endpoints=https://${CP0_IP}:2379 member add ${CP1_HOSTNAME} https://${CP1_IP}:2380
+kubeadm alpha phase kubeconfig all --config /tmp/kubeadm-config.yaml
+kubeadm alpha phase controlplane all --config /tmp/kubeadm-config.yaml
+kubeadm alpha phase kubelet config annotate-cri --config /tmp/kubeadm-config.yaml
+kubeadm alpha phase mark-master --config /tmp/kubeadm-config.yaml
+
+Tests
+-----
+https://scanner.heptio.com/1d798298f54acad1dbc4a5843aaec9eb/
+
+
+Cleanup
+---------
+docker volume ls -qf dangling=true | xargs -r --no-run-if-empty docker volume rm
+
+
+Skipper Upadate Docker image
+---------------------------
+skipper build <Image Name>
+skipper push <Image Name>
+and update skipper.yaml after pushing with new hash that you currentrly pushed
+
+Simple K8S Deploy Yaml
+----------------------
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  selector:
+    matchLabels:
+      app: nginx
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+
+Look for ports:
+---------------
+netstat -tulpn
+
+git Stuff
+---------
+Change date on commit to now
+----------------------------
+git commit --amend --date="$(date -R)"
+
+Rename branch with remote
+-------------------------
+git branch -m new-name
+git push origin :old-name new-name
+git push origin -u new-name
+
+Delete local branches without remote
+------------------------------------
+git remote prune origin
+git branch -vv | grep 'origin/.*: gone]' | awk '{print $1}' | xargs git branch -D
+
+Git clean
+---------
+git clean -fxd
+
+./kubectl run my-nginx --image=nginx --replicas=2 --port=80
+./kubectl expose deployment my-nginx --port=80 --type=NodePort
+./kubectl describe service my-nginx
+
+
+etcd metrics
+------------
+curl -k -cacert /etc/kubernetes/pki/etcd/ca.crt --key /etc/kubernetes/pki/etcd/peer.key --cert /etc/kubernetes/pki/etcd/peer.crt https://127.0.0.1:2379/metrics
+
+
+Running SALT states localy
+--------------------------
+Copy the state file to /srv/salt
+call: salt-call --local state.apply <filename without extention>
+
+
+Trying to fix the hang issue
+----------------------------
+https://docs.fedoraproject.org/en-US/quick-docs/configuring-xorg-as-default-gnome-session/
