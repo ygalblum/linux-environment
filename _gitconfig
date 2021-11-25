@@ -5,6 +5,7 @@
 [alias]
 	ff = difftool -y
     cached = difftool -y --cached
+    force = push --force
 	co = checkout
 	ci = commit
 	b = branch
@@ -13,8 +14,9 @@
 	dup = diff --name-status
 	st = status --un=no
     track = !sh -c 'git branch --track "$0" "$1" && git checkout "$0"'
+    quick-amend = commit --amend --no-edit
 [color]
-	ui = auto
+	ui = true
 [core]
 	excludesfile = /home/ygal/.gitignore
 	autocrlf = input
