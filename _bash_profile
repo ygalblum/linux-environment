@@ -92,6 +92,12 @@ if [ -n "$DESKTOP_SESSION" ];then
     fi
 fi
 
+export PATH=${PATH}:${HOME}/go/bin
+
+function _update_ps1() {
+ export PS1="$(~/tools/powerline/powerline-go-linux-amd64 -modules time,venv,ssh,cwd,perms,git,jobs,exit,root -error $?)"
+}
+export PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
 
 # NodeJS and NPM related
 NPM_PACKAGES="${HOME}/.npm-packages"
