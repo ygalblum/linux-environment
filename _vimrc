@@ -14,6 +14,9 @@ Plugin 'jelera/vim-javascript-syntax'
 Plugin 'pangloss/vim-javascript'
 Plugin 'nathanaelkane/vim-indent-guides'
 Plugin 'Raimondi/delimitMate'
+Plugin 'saltstack/salt-vim'
+Plugin 'fatih/vim-go'
+Plugin 'tyru/open-browser.vim'
 
 "Plugin 'Valloric/YouCompleteMe'
 
@@ -87,7 +90,14 @@ map <F6> :buffers<CR>:e #
 map <C-tab> :b#<cr>
 imap <C-tab> :b#<cr>
 
-colorscheme peachpuff
+if !has('gui_running')
+  colorscheme delek
+else
+  colorscheme peachpuff
+endif
 set guifont=Monospace\ 12
 match ErrorMsg '\s\+$'
 
+let g:netrw_nogx = 1 " disable netrw's gx mapping.
+nmap gx <Plug>(openbrowser-smart-search)
+vmap gx <Plug>(openbrowser-smart-search)
