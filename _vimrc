@@ -85,6 +85,8 @@ set shiftwidth=4
 set expandtab
 " avoid tab2space expansion in Makefile, .mak etc.
 au FileType make setlocal nosmarttab | setlocal noexpandtab
+" Example on how to set a different configuration per directory
+" au BufRead,BufNewFile /home/ygal/work/hirte/* setlocal shiftwidth=8 | setlocal tabstop=8
 
 map <F6> :buffers<CR>:e #
 map <C-tab> :b#<cr>
