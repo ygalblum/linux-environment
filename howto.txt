@@ -156,3 +156,43 @@ call: salt-call --local state.apply <filename without extention>
 Trying to fix the hang issue
 ----------------------------
 https://docs.fedoraproject.org/en-US/quick-docs/configuring-xorg-as-default-gnome-session/
+
+
+Extend qcow image size
+----------------------
+On the host machine:
+sudo qemu-img resize <Image file> +10G
+
+In the guest machine:
+sudo dnf -y install cloud-utils-growpart gdisk
+sudo growpart /dev/vda 1
+sudo xfs_growfs /
+
+Enabling nested virtualization in KVM
+-------------------------------------
+https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/
+
+
+Extend image size and filesystem
+--------------------------------
+When the VM is shut down
+```
+qemu-img resize <Image Name> +SIZE
+```
+In the VM
+```
+lsblk
+sudo growpart <Device Path> <Partition Number>
+sudo xfs_growfs /
+```
+
+Command line loop
+-----------------
+for f in `git status | grep modified  | awk '{print $2}'`; do echo $f; done
+
+for f in `git log --raw -1  | grep 100644 | awk '{print $6}' | grep -v docs |  grep -v "e2e\/quadlet\/"`; do gofmt -s -w $f; done
+
+
+Cleanup none images
+-------------------
+podman image list | grep none | awk '{print $3}' | xargs podman image rm
