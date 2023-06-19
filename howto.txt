@@ -196,3 +196,7 @@ for f in `git log --raw -1  | grep 100644 | awk '{print $6}' | grep -v docs |  g
 Cleanup none images
 -------------------
 podman image list | grep none | awk '{print $3}' | xargs podman image rm
+
+SELinux
+-------
+ausearch -m avc
