@@ -200,3 +200,23 @@ podman image list | grep none | awk '{print $3}' | xargs podman image rm
 SELinux
 -------
 ausearch -m avc
+
+
+SShuttle
+--------
+sshuttle --dns -vr root@helios03.lab.eng.tlv2.redhat.com 192.168.111.0/24
+
+Create VM from qcow2 and cloud-init
+-----------------------------------
+virt-install --name localcloud1 --memory 2048 --noreboot --os-variant detect=on,name=rhel7.9 --cloud-init user-data=/home/images/rhel-7/userdata.yaml --disk=size=10,backing_store=/home/images/rhel-7/rhel-server-7.9-x86_64-kvm.qcow2
+
+Update SELinux labels on qcow2 image
+------------------------------------
+virt-customize -a <IMAGE> --selinux-relabel
+
+
+Go Format
+---------
+Format all files in last commit:
+git log --raw -1 | grep 100644 | awk '{print $6}' | grep "\.go" | xargs gofmt -s -w
+
