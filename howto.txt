@@ -220,3 +220,19 @@ Go Format
 Format all files in last commit:
 git log --raw -1 | grep 100644 | awk '{print $6}' | grep "\.go" | xargs gofmt -s -w
 
+
+Keep Running Pod
+----------------
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: fedora
+spec:
+  containers:
+  - name: fedora
+    image: registry.fedoraproject.org/fedora:38
+    # Just spin & wait forever
+    command: [ "/bin/bash", "-c", "--" ]
+    args: [ "while true; do sleep 30; done;" ]
+```
