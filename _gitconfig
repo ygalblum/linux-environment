@@ -16,7 +16,8 @@
     track = !sh -c 'git branch --track "$0" "$1" && git checkout "$0"'
     quick-amend = commit --amend --no-edit
     align = !sh -c 'git pull --ff-only "$0" "$1"'
-    upstream = align upstream main
+    upstream = !sh -c 'git align upstream `git branch --show-current`'
+    set-date = !sh -c 'git quick-amend --date="\"$(date -R)\""'
 [color]
 	ui = true
 [core]
