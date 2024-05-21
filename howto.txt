@@ -263,3 +263,11 @@ sudo dnf upgrade --refresh
 reboot
 sudo dnf install dnf-plugin-system-upgrade
 sudo dnf system-upgrade download --releasever=40
+
+
+Create an image file
+--------------------
+dd if=/dev/null of=example.img bs=1M seek=10240
+mkfs.ext4 -F example.img
+mkdir /mnt/example
+mount -t ext4 -o loop example.img /mnt/example
