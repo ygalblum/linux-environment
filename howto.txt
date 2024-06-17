@@ -271,3 +271,15 @@ dd if=/dev/null of=example.img bs=1M seek=10240
 mkfs.ext4 -F example.img
 mkdir /mnt/example
 mount -t ext4 -o loop example.img /mnt/example
+
+
+Vault
+-----
+
+Add txt file:
+vault kv put kv/some/path contents=@filename_goes_here
+
+
+By pass HSTS
+------------
+thisisunsafe
