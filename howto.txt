@@ -283,3 +283,8 @@ vault kv put kv/some/path contents=@filename_goes_here
 By pass HSTS
 ------------
 thisisunsafe
+
+
+Get OCP Service CA Certificate
+------------------------------
+oc get configmaps kube-root-ca.crt -o json | jq -r .data.\"ca.crt\" > kube-ca.crt
