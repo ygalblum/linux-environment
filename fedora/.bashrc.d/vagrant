@@ -1,0 +1,1 @@
+. /opt/vagrant/embedded/gems/gems/vagrant-`vagrant --version | awk '{print $2}'`/contrib/bash/completion.sh

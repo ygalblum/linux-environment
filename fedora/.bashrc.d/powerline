@@ -1,0 +1,8 @@
+# Configure bash shell to use powerline by default.
+
+function _update_ps1() {
+## Disable PowerLine since using WARP
+  export PS1="$(~/tools/powerline/powerline-go-linux-amd64 -theme default -modules time,venv,ssh,cwd,perms,git,jobs,exit,root -error $?)"
+}
+export PROMPT_COMMAND="_update_ps1; $PROMPT_COMMAND"
+
