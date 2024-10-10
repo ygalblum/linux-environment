@@ -288,3 +288,48 @@ thisisunsafe
 Get OCP Service CA Certificate
 ------------------------------
 oc get configmaps kube-root-ca.crt -o json | jq -r .data.\"ca.crt\" > kube-ca.crt
+
+## OCP - Reduce storage consumption
+### CNV
+For some reason I can't edit the `importsToKeep` field of the `hyperconverged.status.dataImportCronTemplates.spec`.
+For now, make sure to manually remove the DataVolumes in `openshift-virtualization-os-images` namespace
+
+### Monitoring
+Create or Edit the configmap:
+
+```bash
+oc edit configmap -n openshift-monitoring cluster-monitoring-config
+```
+
+to:
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-monitoring-config
+  namespace: openshift-monitoring
+data:
+  config.yaml: |
+    prometheusK8s:
+      retention: "3d"
+      volumeClaimTemplate:
+        metadata:
+          name: prometheusdb
+        spec:
+          storageClassName: nfs-client
+          resources:
+            requests:
+              storage: 20Gi
+    alertmanagerMain:
+      volumeClaimTemplate:
+        metadata:
+          name: alertmanager
+        spec:
+          storageClassName: nfs-client
+          resources:
+            requests:
+              storage: 20Gi
+```
+Without setting the volumeClaimTemplate it will use a host path a kill the node.
+Make sure to set the PVC size to something you are comfortable with. Note that two of each is created
+Reduce the retention period to reduce consumption
