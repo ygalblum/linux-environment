@@ -333,3 +333,27 @@ data:
 Without setting the volumeClaimTemplate it will use a host path a kill the node.
 Make sure to set the PVC size to something you are comfortable with. Note that two of each is created
 Reduce the retention period to reduce consumption
+
+
+Ontap Simulator
+---------------
+<Type><Number of Disks><Rack>
+Stop before boot
+Run:
+setenv bootarg.vm.sim.vdevinit "31:14:0,31:14:1,31:14:2" 
+setenv bootarg.sim.vdevinit "31:14:0,31:14:1,31:14:2"
+boot
+
+Setup using WebUI
+
+Connect via SSH using admin and password set in previous stage
+storage disk assign -all -node local
+
+Removing a stuck namespace
+--------------------------
+(
+NAMESPACE=your-rogue-namespace
+kubectl proxy &
+kubectl get namespace $NAMESPACE -o json |jq '.spec = {"finalizers":[]}' >temp.json
+curl -k -H "Content-Type: application/json" -X PUT --data-binary @temp.json 127.0.0.1:8001/api/v1/namespaces/$NAMESPACE/finalize
+)
