@@ -340,7 +340,7 @@ Ontap Simulator
 <Type><Number of Disks><Rack>
 Stop before boot
 Run:
-setenv bootarg.vm.sim.vdevinit "31:14:0,31:14:1,31:14:2" 
+setenv bootarg.vm.sim.vdevinit "31:14:0,31:14:1,31:14:2"
 setenv bootarg.sim.vdevinit "31:14:0,31:14:1,31:14:2"
 boot
 
