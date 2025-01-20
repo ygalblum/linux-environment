@@ -368,3 +368,15 @@ curl -k -H "Content-Type: application/json" -X PUT --data-binary @temp.json 127.
 infocmp -x | ssh YOUR-SERVER -- tic -x -
 ```
 
+## Screen
+
+Used to run a disconnected session
+
+### New Session
+```
+screen -S <Name>
+```
+### Connect to existing
+```
+screen -r <Name>
+```
